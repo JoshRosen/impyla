@@ -14,11 +14,16 @@
 
 from __future__ import absolute_import
 
-import ez_setup
-ez_setup.use_setuptools()
+from setuptools import setup, find_packages, __version__ as setuptools_version
+from pkg_resources import parse_version
 
-from setuptools import setup, find_packages
+# Minimum setuptools version which supports "environment markers";
+# see https://stackoverflow.com/a/32643122/590203
+MIN_SETUPTOOLS_VERSION = "20.8.1"
 
+if parse_version(setuptools_version) < parse_version(MIN_SETUPTOOLS_VERSION):
+    raise RuntimeError(
+        "impyla requires setuptools {0} or newer".format(MIN_SETUPTOOLS_VERSION))
 
 def readme():
     with open('README.md', 'r') as ip:
@@ -40,7 +45,13 @@ setup(
     packages=find_packages(),
     install_package_data=True,
     package_data={'impala.thrift': ['*.thrift']},
-    install_requires=['six', 'bitarray', 'thrift>=0.9.3'],
+    install_requires=[
+        'six',
+        'bitarray',
+        # Use 'thrift' on Python 2 and 'thriftpy' on Python 3:
+        'thrift>=0.9.3;python_version<"3"',
+        'thriftpy;python_version>="3"',
+    ],
     keywords=('cloudera impala python hadoop sql hdfs mpp spark pydata '
               'pandas distributed db api pep 249 hive hiveserver2 hs2'),
     license='Apache License, Version 2.0',
