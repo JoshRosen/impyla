@@ -1,0 +1,5 @@
+pandas
+pytest
+sqlalchemy
+thrift_sasl==0.2.1
+unittest2
